@@ -1,0 +1,6 @@
+node_modules
+*.log
+**/*.rpt2_cache
+node_modules
+coverage
+dist
