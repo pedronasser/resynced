@@ -1,7 +1,7 @@
 # Resynced (experimental)
 
 <p>
-  <img src="https://badgen.net/npm/v/pedronasser/resynced" />
+  <img src="https://badgen.net/npm/v/resynced" />
   <img src="https://badgen.net/badge/license/MIT/blue" />
 </p>
 
