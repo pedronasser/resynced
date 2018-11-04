@@ -11,7 +11,7 @@ This experiment goal is help React devs to build **multiple components** using *
 
 **This package requires the Hooks API available only in React 16.7.0-alpha.0 or later.**
 
-## Example
+## 💻 Example
 
 - [Simple Example](https://codesandbox.io/s/3yyr3w7zym)
 
