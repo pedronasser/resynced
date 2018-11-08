@@ -16,6 +16,7 @@ And also provide a way of using that synced state with [Redux](https://redux.js.
 ## 💻 Example
 
 - [Simple Example](https://codesandbox.io/s/3yyr3w7zym)
+- [Resynced With Redux](https://codesandbox.io/s/1yx3n0nz7q)
 
 ## 🔧 Install
 
