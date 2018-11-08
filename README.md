@@ -7,7 +7,9 @@
 
 ## ❤️ Motivation
 
-This experiment goal is help React devs to build **multiple components** using **multiple synced states** using **no context provider**.
+This is an experimental hook that lets you have **multiple components** using **multiple synced states** using **no context provider**.
+
+And also provide a way of using that synced state with [Redux](https://redux.js.org/)!
 
 **This package requires the Hooks API available only in React 16.7.0-alpha.0 or later.**
 
@@ -25,10 +27,10 @@ $ yarn add resynced
 
 
 ```jsx
-import syncedState from 'resynced'
+import { createSynced } from 'resynced'
 
-// creating synced state with initital value "John"
-const useSyncedState = syncedState("John")
+const initialState = "John"
+const [useSyncedState] = createSynced(initialState)
 
 const UsingSharedState = () => {
   const [name, setName] = useSyncedState()
@@ -42,6 +44,59 @@ const UsingSharedState = () => {
 }
 ```
 
+### Using with Redux
+
+Let's first setup our synced redux store (you must have redux installed in your project)
+
+```js
+import { createSyncedRedux } from "resynced"
+import { createStore } from "redux"
+
+const initialState = {
+  authenticated: false
+}
+
+const reducer = (state = initialState, action) => {
+  switch (action.type) {
+    case "LOGIN":
+      return { ...state, authenticated: true }
+    case "LOGOUT":
+      return { ...state, authenticated: false }
+    default:
+      return state
+  }
+}
+
+const authStore = createStore(reducer)
+const [useSyncedAuth] = createSyncedRedux(authStore)
+
+export default useSyncedAuth
+```
+
+Now we can use that synced redux in any component without the need of adding a Context Provider anywhere.
+
+```js
+import React from 'react'
+import useAuth from './authStore'
+
+const ComponentUsingAuth = React.memo(() => {
+  // This component will only update when the 'authenticated'
+  // property is updated
+  const [{ authenticated }, dispatch] = useAuth(["authenticated"])
+
+  return (
+    <div>
+      <h1>Authenticated? {authenticated ? "Yes" : "No"}</h1>
+      <button onClick={() => dispatch({ type: "LOGIN" })}>Login</button>
+      <button onClick={() => dispatch({ type: "LOGOUT" })}>Logout</button>
+    </div>
+  )
+})  
+
+export ComponentUsingAuth
+```
+
+You can check this working example here: [Resynced With Redux](https://codesandbox.io/s/1yx3n0nz7q)
 
 ### Conditional updates
 
@@ -50,11 +105,12 @@ const UsingSharedState = () => {
 The component local state will only be synced if any of the given properties of the state object changes (only works with object states).
 
 ```js
-import syncedState from 'resynced'
+import { createSynced }  from 'resynced'
 
-const useSyncedState = syncedState({
+const initialState = {
   name: "John"
-})
+}
+const [useSyncedState] = createSynced(initialState)
 
 const UsingSharedState = () => {
   const [state, setState] = useSyncedState(["name"])
@@ -73,9 +129,9 @@ const UsingSharedState = () => {
 The component local state will only be synced if the return of the given function is **true**.
 
 ```js
-import syncedState from 'resynced'
+import { createSynced } from 'resynced'
 
-const useSyncedState = syncedState("John")
+const [useSyncedState] = createSynced("John")
 
 const UsingSharedState = () => {
   const [name, setName] = useSyncedState((newState, prevState) => {
@@ -86,62 +142,6 @@ const UsingSharedState = () => {
     <div>
       <h1>My name is {name}</h1>
       <button onClick={() => setName("Jorge")}>Change Name</button>
-    </div>
-  )
-}
-```
-
-### Using with Reducers
-
-```js
-import syncedState, { createReducerHook } from 'resynced'
-
-const myState = syncedState(0)
-const useSyncedState = createReducerHook(myState, (state, action) => {
-  switch (action.type) {
-    case 'INC': return state+1;
-    case 'DEC': return state+1;
-    default: return state;
-  }
-})
-
-const UsingSharedState = () => {
-  const [count, dispatch] = useSyncedState()
-
-  return (
-    <div>
-      <h1>Count: {count}</h1>
-      <button onClick={() => dispatch({ type: 'INC' })}>Increment</button>
-      <button onClick={() => dispatch({ type: 'DEC' })}>Decrement</button>
-    </div>
-  )
-}
-```
-
-### Using with Actions
-
-```js
-import syncedState, { createActionsHook } from 'resynced'
-
-const countState = syncedState(0)
-const useSyncedState = createActionsHook(countState, {
-  inc(state) {
-    return state+1;
-  },
-
-  dec(state) {
-    return state-1;
-  }
-})
-
-const UsingSharedState = () => {
-  const [count, { inc, dec }] = useSyncedState()
-
-  return (
-    <div>
-      <h1>Count: {count}</h1>
-      <button onClick={inc}>Increment</button>
-      <button onClick={dev}>Decrement</button>
     </div>
   )
 }

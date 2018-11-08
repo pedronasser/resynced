@@ -1,20 +1,29 @@
 import React, { useEffect } from 'react'
-import syncedState, { createReducerHook, createActionsHook } from '../src/resynced'
+import { createStore } from 'redux'
+import { createSynced, createSyncedRedux } from '../src/resynced'
 import renderer from 'react-test-renderer';
 
-describe('syncedState', () => {
-  it('should create a new synced state', () => {
-    const state = syncedState()
+const delay = (ms = 1000) => new Promise((resolve) => {
+  setTimeout(() => resolve(), ms)
+})
 
-    expect(state).toBeDefined()
-    expect(typeof state).toEqual('function')
+describe('createSynced', () => {
+  it('should create a new synced state', () => {
+    const [syncedHook] = createSynced()
+
+    expect(syncedHook).toBeDefined()
+    expect(typeof syncedHook).toEqual('function')
   })
 
-  it('should return a usable hook', () => {
-    const useSyncedState = syncedState("Foo")
+  it('should return a working SyncedHook', () => {
+    const [useSyncedState] = createSynced("Foo")
 
     const App = () => {
-      const [state] = useSyncedState()
+      const [state, setState] = useSyncedState()
+
+      useEffect(() => {
+        setState("Bar")
+      }, [])
 
       return (
         <h1>
@@ -24,73 +33,15 @@ describe('syncedState', () => {
     }
 
     const component = renderer.create(<App />)
+    component.update(<App />)
     const tree = component.toJSON();
     expect(tree).toMatchSnapshot();
   })
 })
 
-describe('createReducerHook', () => {
-  it('should create a composed hook with a reducer function', () => {
-    const useSyncedState = syncedState(0)
-    const useSyncedReducerState = createReducerHook(useSyncedState, (state, action) => {
-      switch (action.type) {
-        case "INC": 
-        return state + 1
-        default:
-        return state
-      }
-    })
-
-    let lastState;
-    const App = () => {
-      const [state, dispatch] = useSyncedReducerState()
-      lastState = state
-      
-      useEffect(() => {
-        dispatch({
-          type: "INC"
-        })
-      }, [])
-
-      return null
-    }
-
-    const component = renderer.create(<App />)
-    component.update()
-    expect(lastState).toBe(1);
-  })
-})
-
-describe('createActionsHook', () => {
-  it('should create a composed hook with actions', () => {
-    const useSyncedState = syncedState(0)
-    const useSyncedReducerState = createActionsHook(useSyncedState, {
-      inc(state: number): number {
-        return state+1
-      }
-    })
-
-    let lastState;
-    const App = () => {
-      const [state, { inc }] = useSyncedReducerState()
-      lastState = state
-      
-      useEffect(() => {
-        inc()
-      }, [])
-
-      return null
-    }
-
-    const component = renderer.create(<App />)
-    component.update()
-    expect(lastState).toBe(1);
-  })
-})
-
 describe('SyncedHook', () => {
   it('should let conditional update using function', () => {
-    const useSyncedState = syncedState(0)
+    const [useSyncedState] = createSynced(0)
 
     const mock = jest.fn(() => {
       return false
@@ -109,13 +60,13 @@ describe('SyncedHook', () => {
     }
 
     const component = renderer.create(<App />)
-    component.update()
+    component.update(<App />)
     expect(mock).toHaveBeenCalledTimes(1);
     expect(lastState).toBe(0);
   })
 
   it('should let conditional update using list properties', () => {
-    const useSyncedState = syncedState({
+    const [useSyncedState] = createSynced({
       x: 0
     })
 
@@ -135,11 +86,46 @@ describe('SyncedHook', () => {
     }
 
     let component = renderer.create(<App update={{ y: 1 }} />)
-    component.update()
+    component.update(<App update={{ y: 1 }} />)
     expect(lastState).toBe(0)
 
     component = renderer.create(<App update={{ x: 1 }} />)
-    component.update()
+    component.update(<App update={{ x: 1 }} />)
     expect(lastState).toBe(1)
+  })
+})
+
+describe('createdSyncedRedux', () => {
+  it('should create a ReduxSyncedHook', () => {
+    const store = createStore(() => ({}))
+    const [useSyncedRedux] = createSyncedRedux(store)
+
+    expect(useSyncedRedux).toBeDefined()
+    expect(typeof useSyncedRedux).toEqual('function')
+  })
+
+  it('should return a working ReduxSyncedHook', () => {
+    const initial: any = { x: 0 }
+    const store = createStore((state: any = initial) => ({ x: state.x+1 }))
+    const [useSyncedRedux] = createSyncedRedux(store)
+
+    const App = () => {
+      const [state, dispatch] = useSyncedRedux()
+
+      useEffect(() => {
+        dispatch({ type: "" })
+      }, [])
+
+      return (
+        <h1>
+          {state.x}
+        </h1>
+      )
+    }
+
+    const component = renderer.create(<App />)
+    component.update(<App />)
+    const tree = component.toJSON();
+    expect(tree).toMatchSnapshot();
   })
 })
