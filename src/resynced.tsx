@@ -40,7 +40,7 @@ function registerListenerEffect<T>(listeners: Array<Listener<T>>, currentState: 
       }
     }
 
-    const listenerIndex = listeners.push(listener)
+    const listenerIndex = listeners.push(listener) - 1
     setState.listener = listenerIndex
     return () => {
       listeners.splice(setState.listener, 1)
