@@ -67,7 +67,7 @@ export function createSynced<T = any>(initial: T = {} as T): [SyncedHook<T>, Get
     const localState: T = state[0]
     const setLocalState: any = state[1]
 
-    useEffect(registerListenerEffect(listeners, localState, setLocalState, cond))
+    useEffect(registerListenerEffect(listeners, localState, setLocalState, cond), [])
 
     return [localState, setSharedState]
   }
@@ -97,7 +97,7 @@ export function createSyncedRedux<T = any>(reduxStore: ReduxStore<T>): [ReduxSyn
     const localState: T = state[0]
     const setLocalState: any = state[1]
 
-    useEffect(registerListenerEffect(listeners, localState, setLocalState, cond))
+    useEffect(registerListenerEffect(listeners, localState, setLocalState, cond), [])
 
     return [localState, reduxStore.dispatch]
   }
