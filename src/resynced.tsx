@@ -51,10 +51,9 @@ function registerListenerEffect<T>(listeners: Array<Listener<T>>, currentState: 
 export function createSynced<T = any>(initial: T = {} as T): [SyncedHook<T>, GetStateFunction<T>, SetStateFunction<T>] {
   let sharedState: T = initial
 
-  let listeners: Array<Listener<T>> = []
+  const listeners: Array<Listener<T>> = []
   const setSharedState: SetStateFunction<T> = (newState: T) => {
     const currentListeners = Array.from(listeners)
-    listeners = []
     currentListeners.forEach(listener => listener(newState))
     sharedState = newState
   }
@@ -85,12 +84,11 @@ interface ReduxStore<T> {
 }
 
 export function createSyncedRedux<T = any>(reduxStore: ReduxStore<T>): [ReduxSyncedHook<T>] {
-  let listeners: Array<Listener<T>> = []
+  const listeners: Array<Listener<T>> = []
 
   reduxStore.subscribe(() => {
     const newState = reduxStore.getState()
     const currentListeners = Array.from(listeners)
-    listeners = []
     currentListeners.forEach(listener => listener(newState))
   })
 
