@@ -1,6 +1,6 @@
 {
   "name": "resynced",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Lets you create multiple synced state and use across multiple components using Hooks API instead of Context API.",
   "license": "MIT",
   "main": "dist/resynced.js",
