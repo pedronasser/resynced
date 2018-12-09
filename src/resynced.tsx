@@ -39,11 +39,15 @@ function registerListenerEffect<T>(listeners: Array<Listener<T>>, currentState: 
         setState(nextState)
       }
     }
-
-    const listenerIndex = listeners.push(listener) - 1
-    setState.listener = listenerIndex
+    
+    listeners.push(listener) 
     return () => {
-      listeners.splice(setState.listener, 1)
+      for (let i = listeners.length - 1; ; --i) {
+        if (listeners[i] === listener) {
+          listeners.splice(i, 1);
+          break;
+        }
+      }
     }
   }
 }
