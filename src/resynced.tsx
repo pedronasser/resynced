@@ -1,12 +1,12 @@
 import { useState, useLayoutEffect } from 'react';
 import equal from 'fast-deep-equal'
 
-type GetStateFunction<T> = () => T
-type SetStateFunction<T> = (newState: T) => void
-type UpdateCondition<T> = (nextState: T, prevState: T) => boolean
-type UpdateConditionList = [string]
-type SyncedHook<T> = (cond?: UpdateCondition<T> | UpdateConditionList) => [any, SetStateFunction<T>]
-type Listener<T> = (nextState: T) => void
+export type GetStateFunction<T> = () => T
+export type SetStateFunction<T> = (newState: T) => void
+export type UpdateCondition<T> = (nextState: T, prevState: T) => boolean
+export type UpdateConditionList = string[]
+export type SyncedHook<T> = (cond?: UpdateCondition<T> | UpdateConditionList) => [T, SetStateFunction<T>]
+export type Listener<T> = (nextState: T) => void
 type Effect = () => void
 
 function isObject(val: any): boolean {
@@ -80,7 +80,7 @@ export function createSynced<T = any>(initial: T = {} as T): [SyncedHook<T>, Get
 }
 
 type Dispatcher = (action: any) => any
-type ReduxSyncedHook<T> = (cond?: UpdateCondition<T> | UpdateConditionList | undefined) => [any, Dispatcher]
+type ReduxSyncedHook<T> = (cond?: UpdateCondition<T> | UpdateConditionList | undefined) => [T, Dispatcher]
 interface ReduxStore<T> {
   dispatch: Dispatcher
   getState: () => T
