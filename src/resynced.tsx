@@ -79,8 +79,8 @@ export function createSynced<T = any>(initial: T = {} as T): [SyncedHook<T>, Get
   return [useSyncedState, getSharedState, setSharedState]
 }
 
-type Dispatcher = (action: any) => any
-type ReduxSyncedHook<T> = (cond?: UpdateCondition<T> | UpdateConditionList | undefined) => [T, Dispatcher]
+export type Dispatcher = (action: any) => any
+export type ReduxSyncedHook<T> = (cond?: UpdateCondition<T> | UpdateConditionList | undefined) => [T, Dispatcher]
 interface ReduxStore<T> {
   dispatch: Dispatcher
   getState: () => T
